@@ -1,0 +1,23 @@
+{
+  "name": "derby-timer",
+  "version": "1.1.0",
+  "main": "index.html",
+  "scripts": {
+    "start": "nw"
+  },
+  "window": {
+    "title": "Pinewood Derby Timer",
+    "resizable": true,
+    "icon": "logo_256.png",
+    "frame": true,
+    "width": 800,
+    "height": 585,
+    "position": "center",
+    "min_width": 400,
+    "min_height": 200
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "serialport": "^2.1.2"
+  }
+}
