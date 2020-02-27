@@ -1,0 +1,16 @@
+module.exports = {
+    arrowParens: 'avoid',
+    eslintIntegration: true,
+    singleQuote: true,
+    trailingComma: 'es5',
+    printWidth: 120,
+    jsxBracketSameLine: true,
+    semi: true,
+    tabWidth: 4,
+    useTabs: false,
+    jsxSingleQuote: true,
+    bracketSpacing: true,
+    endOfLine: 'lf',
+    proseWrap: 'preserve',
+    quoteProps: 'as-needed',
+};

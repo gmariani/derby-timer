@@ -20,11 +20,11 @@ Pinewood derby interface for DerbyStick
 7. When ready to race, hold the Switch closed for at least 0.5 seconds to reset the timer. When the Switch is then opened, the timer will begin timing the race and the LED will turn on while racing. When all cars have finished OR 9.8 seconds has elapsed, the timer will stop and the LED will turn off.
 
 # For Developers
-npm serialport requires windows build tools, in adminstrator npm window run:
+npm install --global node-gyp node-pre-gyp nw-gyp
 npm install --global --production windows-build-tools
+npm install serialport --build-from-source
+npm install bootstrap
+npm install jquery popper.js
 
-At this time `node-pre-gyp` doesn't compile correctly and creates errors in serialport. Use the compiled version for v1.0 until issues are resolved. You'll see a lot of yellow text with errors like this when serialport is compiled:
-"warning C4996: 'GetVersionExA': was declared deprecated"
-
-After it installs you will be able to call:
-npm install serialport --save
+/src = nwjs-sdk-v0.44.2-win-x64
+/dist = nwjs-v0.44.2-win-x64

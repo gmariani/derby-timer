@@ -1,11 +1,13 @@
 {
     "env": {
         "browser": true,
-        "worker": true
+        "es6": true,
+        "node": true
     },
     "extends": [],
     "parserOptions": {
-        "sourceType": "module"
+        "sourceType": "module",
+        "ecmaVersion": 6
     },
     "rules": {
         "indent": ["error", 4, { "SwitchCase": 1 }],

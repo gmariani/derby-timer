@@ -1,23 +1,28 @@
 {
-  "name": "derby-timer",
-  "version": "1.1.0",
-  "main": "index.html",
-  "scripts": {
-    "start": "nw"
-  },
-  "window": {
-    "title": "Pinewood Derby Timer",
-    "resizable": true,
-    "icon": "logo_256.png",
-    "frame": true,
-    "width": 800,
-    "height": 585,
-    "position": "center",
-    "min_width": 400,
-    "min_height": 200
-  },
-  "dependencies": {
-    "bootstrap": "^3.3.7",
-    "serialport": "^2.1.2"
-  }
+    "name": "derby-timer",
+    "version": "1.1.0",
+    "main": "index.html",
+    "scripts": {
+        "start": "nw"
+    },
+    "window": {
+        "title": "Pinewood Derby Timer",
+        "resizable": true,
+        "toolbar": true,
+        "icon": "logo_256.png",
+        "frame": true,
+        "width": 800,
+        "height": 585,
+        "position": "center",
+        "min_width": 400,
+        "min_height": 200,
+        "show": false
+    },
+    "dependencies": {
+        "bootstrap": "^4.4.1",
+        "gsap": "^3.2.0",
+        "jquery": "^3.4.1",
+        "popper.js": "^1.16.1",
+        "serialport": "^8.0.7"
+    }
 }

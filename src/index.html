@@ -1,543 +1,135 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title>Pinewood Derby Timer</title>
-		<link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css"/>
-		<style>
-			*, *:before, *:after {
-				-moz-box-sizing: border-box;
-				-webkit-box-sizing: border-box;
-				box-sizing: border-box;
-			}
-			
-			html {
-				font-size: 62.5%;
-			}
-			
-			html, body {
-				-webkit-font-smoothing: antialiased;
-				/*height: 100%;*/
-				flex: 1;
-				display: flex;
-			}
-			
-			body {
-				font-family: "Helvetica", "Arial", sans-serif;
-				color: #333;
-				background-color: #FAF7F3;
-				font-size: 1.5em;
-				line-height: 1.6;
-				font-weight: 400;
-				margin: 0;
-				display: flex;
-				flex-direction: column;
-			}
-			
-			/* Gridly */
-			.row{display:flex}
-			.col{flex:1}
-			@media(max-width:48em){.row{flex-direction:column}.col{flex:0 0 auto}}
-			@media(min-width:48em){.col-tenth{flex:0 0 10%}.col-fifth{flex:0 0 20%}.col-quarter{flex:0 0 25%}.col-third{flex:0 0 33.3333334%}.col-half{flex:0 0 50%}}
-			
-			header {
-				background-color: #A5ECFA;
-				text-align:center;
-				color: #45828E;
-				padding: 24px 0;
-			}
-			
-			h1 {
-				font-size: 5.6rem;
-				line-height: 1.3;
-				letter-spacing: -.1rem;
-				font-weight: 600;
-				margin: 25px 0;
-				color: #003F87;
-			}
-			
-			section {
-			    padding:30px 50px;
-				  padding-right: 0;
-			}
-			
-			main {
-				flex-direction:row;
-				display:flex;
-				flex: 1;
-			}
-			
-			main aside {
-				flex: 0.3;
-				display: flex;
-				flex-direction: column;
-				padding: 30px 50px 30px 0;
-			}
-			
-			main aside h3 {
-				color: rgba(0,0,0,0.4);
-			}
-			
-			main section {
-				flex:1;
-			}
-			
-			#state-disconnected {
-				text-align: center;
-				/*margin: 50px;*/
-			}
-			
-			.instructions {
-				text-align:left;
-				width: 80%;
-				margin: 0 auto;
-				max-height:300px;
-				overflow-y: auto;
-				margin-bottom: 20px;
-			}
-			
-			.result {
-				display: flex;
-				flex-direction: row;
-				align-content: center;
-				align-items: center;
-			}
-			.result h2 {
-				font-size: 5vw;
-				font-weight: 200;
-				width: 16vw;
-				font-style: italic;
-				margin: 0;
-				margin-right: 20px;
-				display: inline-block;
-			}
-			
-			.result span {
-				font-size: 6vw;
-				font-weight: 600;
-			}
-			
-			.result .winner {
-				opacity: 0;
-				color: blue;
-				font-size: 4vw;
-				margin-left: 3vw;
-			}
-			.result .winner.show {
-				-webkit-animation-name: finished;
-    			-webkit-animation-duration: 5s;
-			}
-			@-webkit-keyframes finished {
-				0% {
-					opacity: 1;
-				}
-				50% {
-					opacity: 1;
-				}
-				100% {
-					opacity: 0;
-				}
-			}
-			
-			.log {
-				width: 100%;
-				font-family: Consolas, "Liberation Mono", Menlo, Monaco, Courier, monospace;
-				background-color: #E1E6ED;
-				min-width: 100%;
-				padding: 8px;
-				color: rgba(0, 0, 0, 0.6);
-				border-radius: 2px;
-				font-size: 1.2rem;
-				overflow-y:auto;
-				flex: 1;
-				display: flex;
-				flex-direction: column;
-				border: 1px solid rgb(183, 183, 211);
-				margin-bottom: 30px;
-			}
-			
-			.message {
-				display:block;
-			}
-			.message:nth-child(even) {background: transparent}
-			.message:nth-child(odd) {background: #FFF}
-			
-			hr {
-				margin-top: 1rem;
-				margin-bottom: 1.5rem;
-				border-width: 0;
-				border-top: 1px solid #E1E1E1;
-				-moz-box-sizing: content-box;
-				box-sizing: content-box;
-				height: 0;
-			}
-			
-			.hide {
-				display:none;
-			}
-			select, 
-			button {
-				font-size:16px;
-				padding: 6px 12px;
-				font-weight: 400;
-				line-height: 1.42857143;
-				text-align: center;
-				white-space: nowrap;
-				vertical-align: middle;
-				border-radius: 4px;
-			}
-			select {
-				border: 1px solid #003F87;
-			}
-			button {
-				cursor: pointer;
-				color:white;
-				background-color: #0F5EB6;
-				border: 1px solid #003F87;
-			}
-			button:hover {
-				background-color: #003F87;
-				border: 1px solid #013269;
-			}
-			
-			footer {
-				text-align: center;
-				font-size: 1.2rem;
-			}
-			footer strong {
-				margin-right:10px;
-			}
-			footer small {
-				font-size: 1.0rem;
-			}
-		</style>
-	</head>
-	<body>
-		<section id="state-disconnected">
-			<h1>Pinewood Derby Timer</h1>
-			<div class="instructions">
-				<strong>Instructions</strong>
-				<ol>
-					<li>Insert the <em>DerbyStick</em> into the computer and note the COM port it's connected to.
-						<ol>
-							<li>The computer will assign a COM port number to the <em>DerbyStick</em>. To find this assigned port number look in your Windows Device Manager. Look under <em>Start, Control Panel, Systems, Hardware, Device Manager</em>.</li>
-							<li>In the <em>Device Manager</em> you should find a <em>Ports</em> line if the <em>DerbyStick</em> was recognized by the system.</li>
-							<li>The device will be called something with <em>Silicon Labs</em> in the name. This COM Port number is what you will use when using <em>DerbyTimer</em>.</li>
-							<li>If necessary, confirm the settings on the device:<br/>
-							<code>- Bits per second = 1200<br/>
-- Data bits= 7<br/>
-- Parity = none<br/>
-- Stop bits = 2<br/>
-- Flow control = none</code>
-							</li>
-						</ol>
-					</li>
-					<li>Connect the <em>Start Switch</em> wire to first set of pins on the <em>DerbyStick</em>.</li>
-					<li>Connect <em>Light Sensors</em> to the <em>DerbyStick</em> with the black stripe facing up in the <em>1</em> and <em>2</em> pins respectively.</li>
-					<li>Connect IR light bar to plug and place over <em>Light Sensors</em>.</li>
-					<li>Open <em>DerbyTimer</em> and select the COM port noted earlier and click on <em>Connect</em>.</li>
-					<li>Perform the "Initial Reset" by moving the <em>Start Switch</em> from "Open" to "Closed" and back to "Open" - holding the <em>Start Switch</em> "Closed" for at least 0.5 seconds to reset the timer. This will display "DerbyStick4L v1.0 - 2 Lanes Found" (approximately) in the event log when done properly. The <em>DerbyStick</em> LED will also flash once for each sensor found. If no sensors are found, the LED will flash slowly until the timer is removed from the USB and reinserted.</li>
-					<li>When ready to race, hold the Switch closed for at least 0.5 seconds to reset the timer. When the Switch is then opened, the timer will begin timing the race and the LED will turn on while racing. When all cars have finished OR 9.8 seconds has elapsed, the timer will stop and the LED will turn off.</li>
-				</ol>
-			</div>
-			<select id="selectPort">
-				<option>COM1</option>
-				<option>COM2</option>
-				<option selected>COM3</option>
-				<option>COM4</option>
-				<option>COM5</option>
-			</select>
-			<button onClick="actions.connectPort();" id="btnConnect" >Connect</button>
-		</section>
-		
-		<main id="state-connected" class="hide">
-			<section>
-				<div class="result lane1">
-					<h2>Lane 1</h2> <span id="lane1" class="time">0.000s</span> <span id="winner1" class="winner">Winner</span>
-				</div>
-				<div class="result lane2">
-					<h2>Lane 2</h2> <span id="lane2" class="time">0.000s</span> <span id="winner2" class="winner">Winner</span>
-				</div>
-				<div class="result best">
-					<h2>Best</h2> <span id="best" class="time">0.000s</span>
-				</div>
-			</section>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Pinewood Derby Timer</title>
+        <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/index.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <div class="screen-container">
+            <div id="state-disconnected" class="connect-screen">
+                <img class="connect-screen__logo" src="assets/img/PWD_Header_Landing_Page_2100x600.jpg" width="100%" />
+                <h4 class="connect-screen__cta text-center">To get started, press Connect</h4>
+                <form class="connect-screen__connect form-inline justify-content-center">
+                    <div class="form-group mx-sm-3">
+                        <select id="selectPort" class="form-control">
+                            <option>COM1</option>
+                            <option>COM2</option>
+                            <option selected>COM3</option>
+                            <option>COM4</option>
+                            <option>COM5</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary" onClick="actions.connectPort();" id="btnConnect">
+                        Connect
+                    </button>
+                </div>
+                <div class="connect-screen__instructions hide">
+                    <strong>Instructions</strong>
+                    <ol>
+                        <li>
+                            Insert the <em>DerbyStick</em> into the computer and note the COM port it's connected to.
+                            <ol>
+                                <li>
+                                    The computer will assign a COM port number to the <em>DerbyStick</em>. To find this
+                                    assigned port number look in your Windows Device Manager. Look under
+                                    <em>Start, Control Panel, Systems, Hardware, Device Manager</em>.
+                                </li>
+                                <li>
+                                    In the <em>Device Manager</em> you should find a <em>Ports</em> line if the
+                                    <em>DerbyStick</em> was recognized by the system.
+                                </li>
+                                <li>
+                                    The device will be called something with
+                                    <em>Silicon Labs</em> in the name. This COM Port number is what you will use when using
+                                    <em>DerbyTimer</em>.
+                                </li>
+                                <li>
+                                    If necessary, confirm the settings on the device:<br />
+                                    <code
+                                        >- Bits per second = 1200<br />
+                                        - Data bits= 7<br />
+                                        - Parity = none<br />
+                                        - Stop bits = 2<br />
+                                        - Flow control = none</code
+                                    >
+                                </li>
+                            </ol>
+                        </li>
+                        <li>Connect the <em>Start Switch</em> wire to first set of pins on the <em>DerbyStick</em>.</li>
+                        <li>
+                            Connect <em>Light Sensors</em> to the <em>DerbyStick</em> with the black stripe facing up in the
+                            <em>1</em> and <em>2</em> pins respectively.
+                        </li>
+                        <li>
+                            Connect IR light bar to plug and place over
+                            <em>Light Sensors</em>.
+                        </li>
+                        <li>
+                            Open <em>DerbyTimer</em> and select the COM port noted earlier and click on <em>Connect</em>.
+                        </li>
+                        <li>
+                            Perform the "Initial Reset" by moving the
+                            <em>Start Switch</em> from "Open" to "Closed" and back to "Open" - holding the
+                            <em>Start Switch</em> "Closed" for at least 0.5 seconds to reset the timer. This will display
+                            "DerbyStick4L v1.0 - 2 Lanes Found" (approximately) in the event log when done properly. The
+                            <em>DerbyStick</em> LED will also flash once for each sensor found. If no sensors are found, the
+                            LED will flash slowly until the timer is removed from the USB and reinserted.
+                        </li>
+                        <li>
+                            When ready to race, hold the Switch closed for at least 0.5 seconds to reset the timer. When the
+                            Switch is then opened, the timer will begin timing the race and the LED will turn on while
+                            racing. When all cars have finished OR 9.8 seconds has elapsed, the timer will stop and the LED
+                            will turn off.
+                        </li>
+                    </ol>
+                </div>
+            </div>
 
-			<aside>
-				<h3>Activity Log</h3>
-				<div id="log" class="log">
-					<div class="message"></div>
-				</div>
-				<footer>
-					<button onClick="actions.resetTimer();" id="btnReset" >Reset Timer</button>
-					<button onClick="actions.closePort();" id="btnClose" >Close Timer</button>
-				</footer>
-			</aside>
-		</main>
-		
-		<footer>
-			<div>
-				<strong>Status</strong><span id="status"></span>
-			</div>
-			<small>Node <script>document.write( process.versions.node );</script> | NW.js <script>document.write( process.versions['node-webkit'] );</script></small>
-		</footer>
-		
-		<script>
-			// node-webkit
-			var gui = require("nw.gui");
-			var SerialPort = require("serialport").SerialPort;
-			var win = gui.Window.get();
-			
-			// Auto open devtools
-			//win.showDevTools();
+            <div id="state-connected" class="timer-screen">
+                <section>
+                    <div class="result lane1">
+                        <h2>Lane 1</h2>
+                        <span id="lane1" class="time">0.000s</span>
+                        <span id="winner1" class="winner">Winner</span>
+                    </div>
+                    <div class="result lane2">
+                        <h2>Lane 2</h2>
+                        <span id="lane2" class="time">0.000s</span>
+                        <span id="winner2" class="winner">Winner</span>
+                    </div>
+                    <div class="result best">
+                        <h2>Best</h2>
+                        <span id="best" class="time">0.000s</span>
+                    </div>
+                </section>
 
-			var model = {
-				best: 9.999,
-				serialPort: null,
-				elBest: document.getElementById('best'),
-				elStatus: document.getElementById('status'),
-				elLog: document.getElementById('log'),
-				elLane1: document.getElementById('lane1'),
-				elLane2: document.getElementById('lane2'),
-				elWinner1: document.getElementById('winner1'),
-				elWinner2: document.getElementById('winner2'),
-				btnReset: document.getElementById('btnReset'),
-				btnConnect: document.getElementById('btnConnect'),
-				btnClose: document.getElementById('btnClose'),
-				selectPort: document.getElementById('selectPort'),
-				sectDiscon: document.getElementById('state-disconnected'),
-				sectCon: document.getElementById('state-connected'),
-				log: '<div class="message">Waiting...</div>',
-				portPath: 'COM3',
-				laneReset: false,
-				lane1: '0.000',
-				lane2: '0.000',
-				prevData: '',
-				statusMsg: 'Waiting...',
-				isConnecting: false,
-				isConnected: function() {
-					return model.serialPort ? model.serialPort.isOpen() : false; 
-				},
-			}
-			
-			var actions = {
-				resetTimer: function() {
-					/*model.serialPort.list(function( err, ports ) {
-						actions.addLog( 'Open ports' );
-						ports.forEach(function( port ) {
-							console.log( port );
-							actions.addLog( port.comName + ' ' + port.pnpId + ' ' + port.manufacturer );
-						});
-					});*/
-					
-					//	Send single 'space' to reset timer
-					model.serialPort.write(' ', function(error, results) {
-						if ( error ) {
-							actions.addLog('Error resetting timer (' + error + ')');
-							console.log('Error resetting timer ' + error, results);
-						}
-						actions.addLog('Auto reset timer');
-						actions.addLog( '-------------------');
-						
-						// Render after reset
-						renderView();
-					});
-				},
-				
-				addLog: function( str ) {
-					model.log += '<div class="message">' + str + '</div>';
-					model.elLog.insertAdjacentHTML('beforeend', '<div class="message">' + str + '</div>');
-					model.elLog.scrollTop = model.elLog.scrollHeight;
-				},
-				
-				clearLog: function() {
-					model.log = '<div class="message">Waiting...</div>';
-					model.elLog.innerHTML = model.log;
-					model.elLog.scrollTop = model.elLog.scrollHeight;
-				},
-				
-				connectPort: function() {
-					model.portPath = model.selectPort.options[model.selectPort.selectedIndex].text;
-					model.serialPort = new SerialPort( model.portPath, {
-						baudrate: 1200,
-						dataBits: 7,
-						stopBits: 2,
-						parity: 'none'
-					}, false); // this is the openImmediately flag [default is true]
-					
-					// Open port
-					actions.openPort();
-					
-					// Render after close
-					//renderView();
-				},
-				
-				closePort: function() {
-					model.serialPort.close(function( error ) {
-						if ( error ) {
-							model.elStatus.innerHTML = 'Error closing port ' + model.serialPort.path + ' (' + error + ')';
-						} else {
-							model.isConnecting = false;
-							model.statusMsg = model.serialPort.path + ' Port Closed';
-							actions.addLog( model.statusMsg );
-							model.serialPort = null;
-							
-							// Render after close
-							renderView();
-						}
-					});
-					
-					// Clear log
-					actions.clearLog();
-				},
-				
-				openPort: function() {
-					model.statusMsg = model.serialPort.path + ' Port Connecting...';
-					model.isConnecting = true;
-					renderView();
-					
-					model.serialPort.open(function(error) {
-						if ( error ) {
-							model.statusMsg = 'Error opening port ' + model.serialPort.path + ' (' + error + ')';
-							model.isConnecting = false;
-							renderView();
-						} else {
-							model.isConnecting = false;
-							model.statusMsg = model.serialPort.path + ' Port Ready';
-							actions.addLog( model.statusMsg );
-							
-							// Auto reset
-							actions.resetTimer();
-							
-							model.serialPort.on( 'data', function(data) {
-								var str = String( data );
-								//actions.addLog( 'Raw Data: "' + str + '" Len:' + str.length);
-								
-								if ( str ) {
-									// Is complete data?
-									if ( str.length >= 22 && escape(str).endsWith('%0D%0A') ) {
-										var arrResults = /(\d)\s+([0-9]*\.[0-9]+|[0-9]+)\s+(\d)\s+([0-9]*\.[0-9]+|[0-9]+)/.exec(str);
-										console.log( arrResults );
-										actions.addLog( 'Raw Data: "' + str + '" Len:' + str.length);
-										//actions.addLog( 'Complete results' );
-										model.prevData = '';
-										model.laneReset = false;
-										
-										if ( arrResults[1] == 0 && arrResults[3] == 0) {
-											actions.addLog( 'Manual Timer Reset' );
-											model.laneReset = true;
-										} else {
-											model['lane' + arrResults[1]] = parseFloat( arrResults[2] ); // Winner
-											model['lane' + arrResults[3]] = parseFloat( arrResults[4] );
-										}
-										
-										// Auto reset
-										actions.resetTimer();
-									} else {
-										// Sometimes the data comes in multiple passes, this tries to salvage the data
-										if ( model.prevData && escape(str).endsWith('%0D%0A') ) {
-											str = model.prevData + str;
-											var arrResults = /(\d)\s+([0-9]*\.[0-9]+|[0-9]+)\s+(\d)\s+([0-9]*\.[0-9]+|[0-9]+)/.exec(str);
-											console.log( arrResults );
-											//actions.addLog( 'Reconstructed results: "' + str + '" "' + escape(str) + '"' + str.length);
-											actions.addLog( '(Multi) Raw Data: "' + str + '" Len:' + str.length);
-											//actions.addLog( 'Complete results' );
-											model.prevData = '';
-											model.laneReset = false;
-											
-											if ( arrResults[1] == 0 && arrResults[3] == 0) {
-												actions.addLog( 'Manual Timer Reset' );
-												model.laneReset = true;
-											} else {
-												model['lane' + arrResults[1]] = parseFloat( arrResults[2] ); // Winner
-												model['lane' + arrResults[3]] = parseFloat( arrResults[4] );
-											}
-											
-											// Auto reset
-											actions.resetTimer();
-										// If data is split, save the data
-										} else {
-											model.prevData = model.prevData + str;
-											console.log( 'model.prevData', model.prevData );
-											//actions.addLog( 'Partial results' );
-										}
-									}
-								} else {
-									actions.addLog( 'Failed to get results' );
-								}
-								
-								// Render after data
-								renderView();
-							});
-						}
-						
-						renderView();
-					});
-				}
-			}
-			
-			// List ports
-			// Currently not available
-			/*model.serialPort.list(function(err, ports) {
-				actions.addLog('Open ports');
-				ports.forEach(function( port ) {
-					console.log(port);
-					actions.addLog(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
-				});
-			});
-			*/
-			
-			function renderView() {
-				model.btnConnect.disabled = model.isConnecting;
-				
-				if ( true === model.isConnected() ) {
-					model.sectCon.classList.remove('hide');
-					model.sectDiscon.classList.add('hide');
-				} else {
-					model.sectCon.classList.add('hide');
-					model.sectDiscon.classList.remove('hide');
-				}
-				
-				// Hide winner notification
-				model.elWinner1.classList.remove("show");
-				model.elWinner2.classList.remove("show");
+                <aside>
+                    <h3>Activity Log</h3>
+                    <div id="log" class="log">
+                        <div class="message"></div>
+                    </div>
+                    <footer>
+                        <button onClick="actions.resetTimer();" id="btnReset">
+                            Reset Timer
+                        </button>
+                        <button onClick="actions.closePort();" id="btnClose">
+                            Close Timer
+                        </button>
+                    </footer>
+                </aside>
+            </div>
+        </div>
 
-				// -> triggering reflow /* The actual magic */
-				void model.elWinner1.offsetWidth;
-				void model.elWinner2.offsetWidth;
-				
-				if ( model.laneReset || (model.lane1 > 0 && model.lane2 > 0 && model.lane1 == model.lane2) ) {
-					// Switch error
-					model.elLane1.innerHTML = 'Sensor Error';
-					model.elLane2.innerHTML = 'Sensor Error';
-				} else {
-					// Show winner notification
-					if ( model.lane1 < model.lane2 ) {
-						model.elWinner1.classList.add("show");
-					} else if ( model.lane2 < model.lane1 ) {
-						model.elWinner2.classList.add("show");
-					}
-					
-					// Show lane times
-					model.elLane1.innerHTML = model.lane1 + 's';
-					model.elLane2.innerHTML = model.lane2 + 's';
-					
-					// Update best time
-					// Don't allow best times less than 2.2s in case it's a glitch
-					if ( model.best > model.lane1 && model.lane1 > 2.2 ) {
-						model.best = model.lane1;
-					}
-					if ( model.best > model.lane2 && model.lane2 > 2.2 ) {
-						model.best = model.lane2;
-					}
-					model.elBest.innerHTML = model.best + 's';
-				}
-
-				model.elStatus.innerHTML = model.statusMsg;
-				model.laneReset = false;
-			}
-			
-			renderView();
-		</script>
-	</body>
+        <footer class="fixed-bottom p-1 text-center text-muted">
+            <div class="small"><strong class="mr-1">Status</strong><span id="status"></span></div>
+            <small
+                >Node <span id="node-version"></span> | NW.js <span id="nw-version"></span> | NW.js Flavor
+                <span id="nw-flavor"></span
+            ></small>
+        </footer>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.0/gsap.min.js"></script>
+        <script src="assets/js/index.js"></script>
+    </body>
 </html>
