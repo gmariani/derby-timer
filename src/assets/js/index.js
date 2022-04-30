@@ -1,7 +1,14 @@
 // UMD / CommonJS modules
-//import { gsap } from 'gsap';
-//import { gsap } from "gsap/dist/gsap";
+//const SerialPort = require('serialport');
+//const bootstrap = require('bootstrap');
 //const { gsap } = require('gsap/dist/gsap');
+//const gsap = require('gsap/dist/gsap').gsap;
+
+// ES Modules
+//import { gsap } from 'gsap';
+
+'use strict';
+
 const SerialPort = function(path, openOptions, openCallback) {
     let _isOpen = false;
     const _eventCallbacks = [];
@@ -14,42 +21,53 @@ const SerialPort = function(path, openOptions, openCallback) {
         setTimeout(function() {
             _eventCallbacks['data']('');
         }, 500);
+        setTimeout(function() {
+            _eventCallbacks['data']('DerbyStick v1.0 2 lanes found' + unescape('%0D%0A'));
+        }, 1000);
+        setTimeout(function() {
+            _eventCallbacks['data']('1 2.1234 2 2.5678' + unescape('%0D%0A'));
+        }, 4000);
     };
     this.on = function(event, callback) {
         _eventCallbacks[`${event}`] = callback.bind(callback);
     };
-    this.list = function() {
-        return true;
+    this.list = function(callback) {
+        setTimeout(
+            callback.bind(callback, null, [{ comName: 'Test', pnpId: '1234', manufacturer: 'Example Co' }]),
+            250
+        );
     };
-    this.write = function() {
-        return true;
+    this.write = function(str, callback) {
+        setTimeout(callback.bind(callback), 250);
     };
-    this.close = function() {
+    this.close = function(callback) {
         _isOpen = false;
+        setTimeout(callback.bind(callback), 250);
     };
     this.path = path;
-}; //require('serialport');
-const win = nw.Window.get();
+};
 
-// Auto open devtools
-win.showDevTools();
-
+//const win = nw.Window.get();
+//win.showDevTools();
 var model = {
+    DISCONNECTED: 'disconnected',
+    CONNECTED: 'connected',
+    initial: true,
     best: 9.999,
     serialPort: null,
-    elBest: document.getElementById('best'),
+    currentScreen: null,
+    nextScreen: null,
+    elBest: document.getElementById('best-time'),
     elStatus: document.getElementById('status'),
     elLog: document.getElementById('log'),
-    elLane1: document.getElementById('lane1'),
-    elLane2: document.getElementById('lane2'),
-    elWinner1: document.getElementById('winner1'),
-    elWinner2: document.getElementById('winner2'),
-    btnReset: document.getElementById('btnReset'),
+    elResetMsg: document.getElementById('reset-msg'),
+    elLaneTitle1: document.getElementById('lane1-title'),
+    elLaneTitle2: document.getElementById('lane2-title'),
+    elLaneTime1: document.getElementById('lane1-time'),
+    elLaneTime2: document.getElementById('lane2-time'),
     btnConnect: document.getElementById('btnConnect'),
-    btnClose: document.getElementById('btnClose'),
     selectPort: document.getElementById('selectPort'),
-    sectDiscon: document.getElementById('state-disconnected'),
-    sectCon: document.getElementById('state-connected'),
+
     log: '<div class="message">Waiting...</div>',
     portPath: 'COM3',
     laneReset: false,
@@ -62,25 +80,51 @@ var model = {
         return model.serialPort ? model.serialPort.isOpen() : false;
     },
 };
+const disconnectAnimate = gsap.timeline({
+    defaults: { ease: 'power1.out' },
+    paused: true,
+});
+disconnectAnimate.to('.timer-screen', { duration: 0.5, autoAlpha: 0 }, 1);
+disconnectAnimate.to('.connect-screen', { duration: 0.5, autoAlpha: 1 }, 1);
+disconnectAnimate.fromTo(
+    '.connect-screen__logo',
+    { yPercent: 60, autoAlpha: 0 },
+    { duration: 1, autoAlpha: 1, yPercent: 0 },
+    1
+);
+disconnectAnimate.fromTo('.connect-screen__cta', { autoAlpha: 0, y: 0 }, { duration: 0.5, autoAlpha: 1 });
+disconnectAnimate.fromTo('.connect-screen__connect', { autoAlpha: 0, y: 0 }, { duration: 0.5, autoAlpha: 1 });
+
+const connectAnimate = gsap.timeline({ defaults: { ease: 'power1.out' }, paused: true });
+connectAnimate.to('.timer-screen', { duration: 0.5, autoAlpha: 1 }, 2);
+connectAnimate.to('.connect-screen', { duration: 0.5, autoAlpha: 0 }, 2);
+
+const resetAnimate = gsap.timeline({ paused: true });
+resetAnimate.fromTo(
+    '.timer-screen__reset-container',
+    { autoAlpha: 1 },
+    { duration: 1, ease: 'power3.in', autoAlpha: 0 }
+);
 
 var actions = {
     resetTimer: function() {
         model.serialPort.list(function(err, ports) {
-            actions.addLog('Open ports');
+            console.group('List of open ports');
             ports.forEach(port => {
-                console.log(port);
-                actions.addLog(`${port.comName} ${port.pnpId} ${port.manufacturer}`);
+                actions.addLog(`${port.comName} / ${port.pnpId} / ${port.manufacturer}`);
             });
+            console.groupEnd('ListPorts');
         });
 
         //	Send single 'space' to reset timer
         model.serialPort.write(' ', (error, results) => {
             if (error) {
                 actions.addLog('Error resetting timer (' + error + ')');
-                console.log('Error resetting timer ' + error, results);
+                console.log(`Error resetting timer (${error})`, results);
             }
-            actions.addLog('Auto reset timer');
-            actions.addLog('-------------------');
+            actions.addLog('Timer reset (Auto)');
+
+            resetAnimate.play(0);
 
             // Render after reset
             renderView();
@@ -88,13 +132,15 @@ var actions = {
     },
 
     addLog: str => {
-        model.log += '<div class="message">' + str + '</div>';
-        model.elLog.insertAdjacentHTML('beforeend', '<div class="message">' + str + '</div>');
+        console.log(str);
+        const line = `<li class="list-group-item">${str}</li>`;
+        model.log += line;
+        model.elLog.insertAdjacentHTML('beforeend', line);
         model.elLog.scrollTop = model.elLog.scrollHeight;
     },
 
     clearLog: () => {
-        model.log = '<div class="message">Waiting...</div>';
+        model.log = '<li class="list-group-item">Log cleared...</li>';
         model.elLog.innerHTML = model.log;
         model.elLog.scrollTop = model.elLog.scrollHeight;
     },
@@ -119,16 +165,14 @@ var actions = {
     closePort: function() {
         model.serialPort.close(function(error) {
             if (error) {
-                model.elStatus.innerHTML = `Error closing port ${model.serialPort.path} (${error})`;
+                model.statusMsg = `Error closing port ${model.serialPort.path} (${error})`;
             } else {
                 model.isConnecting = false;
                 model.statusMsg = `${model.serialPort.path} Port Closed`;
-                actions.addLog(model.statusMsg);
                 model.serialPort = null;
-
-                // Render after close
-                renderView();
             }
+            actions.addLog(model.statusMsg);
+            renderView();
         });
 
         // Clear log
@@ -137,6 +181,7 @@ var actions = {
 
     openPort: function() {
         model.statusMsg = `${model.serialPort.path} Port Connecting...`;
+        actions.addLog(model.statusMsg);
         model.isConnecting = true;
         renderView();
 
@@ -144,18 +189,16 @@ var actions = {
             if (error) {
                 model.statusMsg = `Error opening port ${model.serialPort.path} (${error})`;
                 model.isConnecting = false;
-                renderView();
             } else {
-                model.isConnecting = false;
                 model.statusMsg = `${model.serialPort.path} Port Ready`;
-                actions.addLog(model.statusMsg);
+                model.isConnecting = false;
 
                 // Auto reset
                 actions.resetTimer();
 
                 model.serialPort.on('data', function(data) {
                     var str = String(data);
-                    //actions.addLog( 'Raw Data: "' + str + '" Len:' + str.length);
+                    //actions.addLog(`Raw Data: "${str}" Len:${str.length}`);
 
                     if (str) {
                         // Is complete data?
@@ -164,13 +207,13 @@ var actions = {
                                 str
                             );
                             console.log(arrResults);
-                            actions.addLog('Raw Data: "' + str + '" Len:' + str.length);
+                            actions.addLog(`Raw Data: "${str}" Len:${str.length}`);
                             //actions.addLog( 'Complete results' );
                             model.prevData = '';
                             model.laneReset = false;
 
                             if (arrResults[1] == 0 && arrResults[3] == 0) {
-                                actions.addLog('Manual Timer Reset');
+                                actions.addLog('Timer Reset (Manual)');
                                 model.laneReset = true;
                             } else {
                                 model['lane' + arrResults[1]] = parseFloat(arrResults[2]); // Winner
@@ -188,13 +231,13 @@ var actions = {
                                 );
                                 console.log(arrResults);
                                 //actions.addLog( 'Reconstructed results: "' + str + '" "' + escape(str) + '"' + str.length);
-                                actions.addLog('(Multi) Raw Data: "' + str + '" Len:' + str.length);
+                                actions.addLog(`(Multi) Raw Data: "${str}" Len:${str.length}`);
                                 //actions.addLog( 'Complete results' );
                                 model.prevData = '';
                                 model.laneReset = false;
 
                                 if (arrResults[1] == 0 && arrResults[3] == 0) {
-                                    actions.addLog('Manual Timer Reset');
+                                    actions.addLog('Timer Reset (Manual)');
                                     model.laneReset = true;
                                 } else {
                                     model['lane' + arrResults[1]] = parseFloat(arrResults[2]); // Winner
@@ -219,6 +262,7 @@ var actions = {
                 });
             }
 
+            actions.addLog(model.statusMsg);
             renderView();
         });
     },
@@ -236,67 +280,65 @@ var actions = {
 
 function renderDisconnected() {
     console.log('renderDisconnected');
-    model.btnConnect.disabled = false;
-
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl.to('.timer-screen', { duration: 0, autoAlpha: 0 });
-    tl.fromTo('.connect-screen', { autoAlpha: 0 }, { duration: 0, autoAlpha: 1 });
-    tl.fromTo(
-        '.connect-screen__logo',
-        { yPercent: 60, autoAlpha: 0 },
-        { duration: 1, delay: 0.5, autoAlpha: 1, yPercent: 0 }
-    );
-    tl.from('.connect-screen__cta', { duration: 0.5, opacity: 0 });
-    tl.from('.connect-screen__connect', { duration: 0.5, autoAlpha: 0 });
-    tl.play(1);
+    model.btnConnect.removeAttribute('disabled');
+    if (null === model.currentScreen) {
+        disconnectAnimate.play(0);
+    } else {
+        // Only animate if different screen
+        if (model.nextScreen != model.currentScreen) {
+            const tl = gsap.timeline();
+            tl.add(connectAnimate.reverse(0));
+            tl.add(disconnectAnimate.play(0), '-=2.5');
+        }
+    }
+    model.currentScreen = model.DISCONNECTED;
 }
 
 function renderConnecting() {
     console.log('renderConnecting');
-    model.btnConnect.disabled = true;
+    model.btnConnect.setAttribute('disabled', 'disabled');
 
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl.to('.timer-screen', { duration: 0.5, autoAlpha: 0 });
-    tl.to('.connect-screen', { duration: 0.5, autoAlpha: 1 });
-    tl.to('.connect-screen__connect', { duration: 0.5, autoAlpha: 0.5 });
-    tl.play(1);
+    // Go to the end of the intro animation
+    // This is to insure if you jump straight to renderConnecting()
+    // the animation is forced to be completed
+    disconnectAnimate.seek(disconnectAnimate.endTime());
+    //gsap.to('.connect-screen__connect', { duration: 0.5, autoAlpha: 0.5 });
+    model.currentScreen = model.DISCONNECTED;
 }
 
 function renderConnected() {
     console.log('renderConnected');
-    model.btnConnect.disabled = false;
+    model.btnConnect.removeAttribute('disabled');
 
-    const tl = gsap.timeline({ defaults: { ease: 'power1.out' } });
-    tl.to('.connect-screen__cta', { duration: 1, autoAlpha: 0, y: '+=10' });
-    tl.to('.connect-screen__connect', { duration: 1, delay: -0.25, autoAlpha: 0, y: '+=10' });
-    tl.to('.connect-screen__logo', { duration: 1, delay: -0.5, autoAlpha: 0, yPercent: 10 });
-    tl.to('.connect-screen', { duration: 0.5, autoAlpha: 0 });
-    tl.to('.timer-screen', { duration: 0.5, autoAlpha: 1 });
-    tl.play(1);
-
-    // Hide winner notification
-    model.elWinner1.classList.remove('show');
-    model.elWinner2.classList.remove('show');
-
-    // -> triggering reflow /* The actual magic */
-    void model.elWinner1.offsetWidth;
-    void model.elWinner2.offsetWidth;
+    // Only animate if different screen
+    if (model.nextScreen != model.currentScreen) {
+        const tl = gsap.timeline();
+        tl.add(disconnectAnimate.reverse());
+        tl.add(connectAnimate.play(0), '-=2.5');
+    }
 
     if (model.laneReset || (model.lane1 > 0 && model.lane2 > 0 && model.lane1 == model.lane2)) {
         // Switch error
-        model.elLane1.innerHTML = 'Error';
-        model.elLane2.innerHTML = 'Error';
+        model.elLaneTime1.innerHTML = 'Error';
+        model.elLaneTime2.innerHTML = 'Error';
     } else {
         // Show winner notification
+        const tl2 = gsap.timeline({ defaults: { ease: 'power2.in' } });
         if (model.lane1 < model.lane2) {
-            model.elWinner1.classList.add('show');
+            tl2.to(model.elLaneTitle2, { duration: 0, color: '#000' }, 1);
+            tl2.to(model.elLaneTime2, { duration: 0, color: '#000' }, 1);
+            tl2.from(model.elLaneTitle1, { duration: 1, color: '#00FF00' }, 2);
+            tl2.from(model.elLaneTime1, { duration: 1, color: '#00FF00' }, 2);
         } else if (model.lane2 < model.lane1) {
-            model.elWinner2.classList.add('show');
+            tl2.to(model.elLaneTitle1, { duration: 0, color: '#000' }, 1);
+            tl2.to(model.elLaneTime1, { duration: 0, color: '#000' }, 1);
+            tl2.from(model.elLaneTitle2, { duration: 1, color: '#00FF00' }, 2);
+            tl2.from(model.elLaneTime2, { duration: 1, color: '#00FF00' }, 2);
         }
 
         // Show lane times
-        model.elLane1.innerHTML = `${model.lane1}s`;
-        model.elLane2.innerHTML = `${model.lane2}s`;
+        model.elLaneTime1.innerHTML = `${model.lane1}s`;
+        model.elLaneTime2.innerHTML = `${model.lane2}s`;
 
         // Update best time
         // Don't allow best times less than 2.2s in case it's a glitch
@@ -310,15 +352,20 @@ function renderConnected() {
     }
 
     model.laneReset = false;
+    model.currentScreen = model.CONNECTED;
 }
 
 function renderView() {
+    console.log('renderView');
     if (true === model.isConnected()) {
+        model.nextScreen = model.CONNECTED;
         renderConnected();
     } else {
         if (model.isConnecting) {
+            model.nextScreen = model.DISCONNECTED;
             renderConnecting();
         } else {
+            model.nextScreen = model.DISCONNECTED;
             renderDisconnected();
         }
     }
@@ -330,7 +377,11 @@ function renderView() {
 }
 
 // Show window once loaded and ready
-onload = function() {
-    win.show();
-    renderView();
-};
+//onload = function() {
+win.show();
+
+// Auto open devtools
+win.showDevTools();
+
+renderView();
+//};

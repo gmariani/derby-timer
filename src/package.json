@@ -1,9 +1,17 @@
 {
     "name": "derby-timer",
+    "author": "Gabriel Mariani",
     "version": "1.1.0",
+    "description": "Manages times between two lanes in a pinewood derby",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gmariani/derby-timer.git"
+    },
+    "license": "LICENSE",
     "main": "index.html",
+    "type": "module",
     "scripts": {
-        "start": "nw"
+        "start": "nw ."
     },
     "window": {
         "title": "Pinewood Derby Timer",
@@ -15,12 +23,11 @@
         "height": 585,
         "position": "center",
         "min_width": 400,
-        "min_height": 200,
-        "show": false
+        "min_height": 200
     },
     "dependencies": {
         "bootstrap": "^4.4.1",
-        "gsap": "^3.2.0",
+        "gsap": "^3.2.2",
         "jquery": "^3.4.1",
         "popper.js": "^1.16.1",
         "serialport": "^8.0.7"

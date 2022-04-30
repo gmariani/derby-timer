@@ -20,8 +20,9 @@ Pinewood derby interface for DerbyStick
 7. When ready to race, hold the Switch closed for at least 0.5 seconds to reset the timer. When the Switch is then opened, the timer will begin timing the race and the LED will turn on while racing. When all cars have finished OR 9.8 seconds has elapsed, the timer will stop and the LED will turn off.
 
 # For Developers
-npm install --global node-gyp node-pre-gyp nw-gyp
-npm install --global --production windows-build-tools
+npm install -g node-gyp node-pre-gyp nw-gyp
+npm install -g --production windows-build-tools
+npm install -g prebuild
 npm install serialport --build-from-source
 npm install bootstrap
 npm install jquery popper.js

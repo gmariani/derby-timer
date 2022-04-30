@@ -10,18 +10,18 @@
 				-webkit-box-sizing: border-box;
 				box-sizing: border-box;
 			}
-			
+
 			html {
 				font-size: 62.5%;
 			}
-			
+
 			html, body {
 				-webkit-font-smoothing: antialiased;
 				/*height: 100%;*/
 				flex: 1;
 				display: flex;
 			}
-			
+
 			body {
 				font-family: "Helvetica", "Arial", sans-serif;
 				color: #333;
@@ -33,20 +33,20 @@
 				display: flex;
 				flex-direction: column;
 			}
-			
+
 			/* Gridly */
 			.row{display:flex}
 			.col{flex:1}
 			@media(max-width:48em){.row{flex-direction:column}.col{flex:0 0 auto}}
 			@media(min-width:48em){.col-tenth{flex:0 0 10%}.col-fifth{flex:0 0 20%}.col-quarter{flex:0 0 25%}.col-third{flex:0 0 33.3333334%}.col-half{flex:0 0 50%}}
-			
+
 			header {
 				background-color: #A5ECFA;
 				text-align:center;
 				color: #45828E;
 				padding: 24px 0;
 			}
-			
+
 			h1 {
 				font-size: 5.6rem;
 				line-height: 1.3;
@@ -55,38 +55,38 @@
 				margin: 25px 0;
 				color: #003F87;
 			}
-			
+
 			section {
 			    padding:30px 50px;
 				  padding-right: 0;
 			}
-			
+
 			main {
 				flex-direction:row;
 				display:flex;
 				flex: 1;
 			}
-			
+
 			main aside {
 				flex: 0.3;
 				display: flex;
 				flex-direction: column;
 				padding: 30px 50px 30px 0;
 			}
-			
+
 			main aside h3 {
 				color: rgba(0,0,0,0.4);
 			}
-			
+
 			main section {
 				flex:1;
 			}
-			
+
 			#state-disconnected {
 				text-align: center;
 				/*margin: 50px;*/
 			}
-			
+
 			.instructions {
 				text-align:left;
 				width: 80%;
@@ -95,7 +95,7 @@
 				overflow-y: auto;
 				margin-bottom: 20px;
 			}
-			
+
 			.result {
 				display: flex;
 				flex-direction: row;
@@ -111,12 +111,12 @@
 				margin-right: 20px;
 				display: inline-block;
 			}
-			
+
 			.result span {
 				font-size: 6vw;
 				font-weight: 600;
 			}
-			
+
 			.result .winner {
 				opacity: 0;
 				color: blue;
@@ -138,7 +138,7 @@
 					opacity: 0;
 				}
 			}
-			
+
 			.log {
 				width: 100%;
 				font-family: Consolas, "Liberation Mono", Menlo, Monaco, Courier, monospace;
@@ -155,13 +155,13 @@
 				border: 1px solid rgb(183, 183, 211);
 				margin-bottom: 30px;
 			}
-			
+
 			.message {
 				display:block;
 			}
 			.message:nth-child(even) {background: transparent}
 			.message:nth-child(odd) {background: #FFF}
-			
+
 			hr {
 				margin-top: 1rem;
 				margin-bottom: 1.5rem;
@@ -171,11 +171,11 @@
 				box-sizing: content-box;
 				height: 0;
 			}
-			
+
 			.hide {
 				display:none;
 			}
-			select, 
+			select,
 			button {
 				font-size:16px;
 				padding: 6px 12px;
@@ -199,7 +199,7 @@
 				background-color: #003F87;
 				border: 1px solid #013269;
 			}
-			
+
 			footer {
 				text-align: center;
 				font-size: 1.2rem;
@@ -233,7 +233,7 @@
 						</ol>
 					</li>
 					<li>Connect the <em>Start Switch</em> wire to first set of pins on the <em>DerbyStick</em>.</li>
-					<li>Connect <em>Light Sensors</em> to the <em>DerbyStick</em> with the black stripe facing up in the <em>1</em> and <em>2</em> pins respectively.</li>
+					<li>Connect <em>Light Sensors</em> to the <em>DerbyStick</em> with the black stripe facing up in the <em>1</em> and <em>2</em> pins respectively. The wire with the black electrical tape must have the black stripe facing down.</li>
 					<li>Connect IR light bar to plug and place over <em>Light Sensors</em>.</li>
 					<li>Open <em>DerbyTimer</em> and select the COM port noted earlier and click on <em>Connect</em>.</li>
 					<li>Perform the "Initial Reset" by moving the <em>Start Switch</em> from "Open" to "Closed" and back to "Open" - holding the <em>Start Switch</em> "Closed" for at least 0.5 seconds to reset the timer. This will display "DerbyStick4L v1.0 - 2 Lanes Found" (approximately) in the event log when done properly. The <em>DerbyStick</em> LED will also flash once for each sensor found. If no sensors are found, the LED will flash slowly until the timer is removed from the USB and reinserted.</li>
@@ -249,7 +249,7 @@
 			</select>
 			<button onClick="actions.connectPort();" id="btnConnect" >Connect</button>
 		</section>
-		
+
 		<main id="state-connected" class="hide">
 			<section>
 				<div class="result lane1">
@@ -274,21 +274,21 @@
 				</footer>
 			</aside>
 		</main>
-		
+
 		<footer>
 			<div>
 				<strong>Status</strong><span id="status"></span>
 			</div>
 			<small>Node <script>document.write( process.versions.node );</script> | NW.js <script>document.write( process.versions['node-webkit'] );</script></small>
 		</footer>
-		
+
 		<script>
 			// node-webkit
 			var gui = require("nw.gui");
 			var SerialPortStatic = require("serialport");
 			var SerialPort = SerialPortStatic.SerialPort;
 			var win = gui.Window.get();
-			
+
 			// Auto open devtools
 			//win.showDevTools();
 
@@ -317,10 +317,10 @@
 				statusMsg: 'Waiting...',
 				isConnecting: false,
 				isConnected: function() {
-					return model.serialPort ? model.serialPort.isOpen() : false; 
+					return model.serialPort ? model.serialPort.isOpen() : false;
 				},
 			}
-			
+
 			var actions = {
 				resetTimer: function() {
 					//	Send single 'space' to reset timer
@@ -331,24 +331,24 @@
 						}
 						actions.addLog('Auto reset timer');
 						actions.addLog( '-------------------');
-						
+
 						// Render after reset
 						renderView();
 					});
 				},
-				
+
 				addLog: function( str ) {
 					model.log += '<div class="message">' + str + '</div>';
 					model.elLog.insertAdjacentHTML('beforeend', '<div class="message">' + str + '</div>');
 					model.elLog.scrollTop = model.elLog.scrollHeight;
 				},
-				
+
 				clearLog: function() {
 					model.log = '<div class="message">Waiting...</div>';
 					model.elLog.innerHTML = model.log;
 					model.elLog.scrollTop = model.elLog.scrollHeight;
 				},
-				
+
 				connectPort: function() {
 					model.portPath = model.selectPort.options[model.selectPort.selectedIndex].value;
 					model.serialPort = new SerialPort( model.portPath, {
@@ -357,14 +357,14 @@
 						stopBits: 2,
 						parity: 'none'
 					}, false); // this is the openImmediately flag [default is true]
-					
+
 					// Open port
 					actions.openPort();
-					
+
 					// Render after close
 					//renderView();
 				},
-				
+
 				closePort: function() {
 					model.serialPort.close(function( error ) {
 						if ( error ) {
@@ -374,21 +374,21 @@
 							model.statusMsg = model.serialPort.path + ' Port Closed';
 							actions.addLog( model.statusMsg );
 							model.serialPort = null;
-							
+
 							// Render after close
 							renderView();
 						}
 					});
-					
+
 					// Clear log
 					actions.clearLog();
 				},
-				
+
 				openPort: function() {
 					model.statusMsg = model.serialPort.path + ' Port Connecting...';
 					model.isConnecting = true;
 					renderView();
-					
+
 					model.serialPort.open(function(error) {
 						if ( error ) {
 							model.statusMsg = 'Error opening port ' + model.serialPort.path + ' (' + error + ')';
@@ -398,87 +398,129 @@
 							model.isConnecting = false;
 							model.statusMsg = model.serialPort.path + ' Port Ready';
 							actions.addLog( model.statusMsg );
-							
+
 							// Auto reset
 							actions.resetTimer();
-							
+
 							model.serialPort.on( 'data', function(data) {
 								var str = String( data );
+
+								console.group('Serial Data');
+								console.info(data);
+								console.groupEnd();
+
+								console.group('String Data');
+								console.info(str);
+								console.groupEnd();
 								//actions.addLog( 'Raw Data: "' + str + '" Len:' + str.length);
-								
+								// 2/21/2020
+								// In some situations the data sent will be less than 22
+								// then a single character will come in creating 22
+								// but for some reason, concating the string isn't enough
+								// for the program to think it's complete. maybe when doing
+								// partial data, store a slice of the native buffer
+								// so it's in its raw form when concating and then compare more
+								// accurately. that should help missing results
 								if ( str ) {
 									// Is complete data?
 									if ( str.length >= 22 && escape(str).endsWith('%0D%0A') ) {
 										var arrResults = /(\d)\s+([0-9]*\.[0-9]+|[0-9]+)\s+(\d)\s+([0-9]*\.[0-9]+|[0-9]+)/.exec(str);
-										console.log( arrResults );
+										console.group('Complete Results Match');
+										console.log(arrResults);
+										console.groupEnd();
+
 										actions.addLog( 'Raw Data: "' + str + '" Len:' + str.length);
 										//actions.addLog( 'Complete results' );
 										model.prevData = '';
 										model.laneReset = false;
-										
-										if ( arrResults[1] == 0 && arrResults[3] == 0) {
-											actions.addLog( 'Manual Timer Reset' );
-											model.laneReset = true;
-										} else {
-											model['lane' + arrResults[1]] = parseFloat( arrResults[2] ); // Winner
-											model['lane' + arrResults[3]] = parseFloat( arrResults[4] );
+
+										// Only if this matches result data
+										// and not init data:
+										// DerbyStick2L v1.0  -  1 Lanes Found
+										// DerbyStick2L v1.0  -  2 Lanes Found
+										if (arrResults) {
+											if ( arrResults[1] == 0 && arrResults[3] == 0) {
+												actions.addLog( 'Manual Timer Reset' );
+												console.info('Manual Timer Reset');
+												model.laneReset = true;
+											} else {
+												console.info('Declare winner');
+												console.log('lane ' + arrResults[1] + ' wins @ ' + arrResults[2]);
+												console.log('lane ' + arrResults[3] + ' loses @ ' + arrResults[4]);
+												model['lane' + arrResults[1]] = parseFloat( arrResults[2] ); // Winner
+												model['lane' + arrResults[3]] = parseFloat( arrResults[4] );
+											}
 										}
-										
+
 										// Auto reset
+										console.info('Auto Timer Reset');
 										actions.resetTimer();
 									} else {
 										// Sometimes the data comes in multiple passes, this tries to salvage the data
 										if ( model.prevData && escape(str).endsWith('%0D%0A') ) {
 											str = model.prevData + str;
 											var arrResults = /(\d)\s+([0-9]*\.[0-9]+|[0-9]+)\s+(\d)\s+([0-9]*\.[0-9]+|[0-9]+)/.exec(str);
-											console.log( arrResults );
+											console.group('Reconstructed Results Match');
+											console.log(arrResults);
+											console.groupEnd();
+
 											//actions.addLog( 'Reconstructed results: "' + str + '" "' + escape(str) + '"' + str.length);
 											actions.addLog( '(Multi) Raw Data: "' + str + '" Len:' + str.length);
 											//actions.addLog( 'Complete results' );
 											model.prevData = '';
 											model.laneReset = false;
-											
+
 											if ( arrResults[1] == 0 && arrResults[3] == 0) {
 												actions.addLog( 'Manual Timer Reset' );
+												console.info('Manual Timer Reset');
 												model.laneReset = true;
 											} else {
+												console.info('Declare winner');
+												console.log('lane ' + arrResults[1] + ' wins @ ' + arrResults[2]);
+												console.log('lane ' + arrResults[3] + ' loses @ ' + arrResults[4]);
 												model['lane' + arrResults[1]] = parseFloat( arrResults[2] ); // Winner
 												model['lane' + arrResults[3]] = parseFloat( arrResults[4] );
 											}
-											
+
 											// Auto reset
+											console.info('Auto Timer Reset');
 											actions.resetTimer();
 										// If data is split, save the data
 										} else {
+											console.group('Partial Data');
+											console.log(str);
+											console.log(model.prevData);
 											model.prevData = model.prevData + str;
-											console.log( 'model.prevData', model.prevData );
+											console.log(model.prevData);
+											console.groupEnd();
 											//actions.addLog( 'Partial results' );
 										}
 									}
 								} else {
 									actions.addLog( 'Failed to get results' );
+									console.error('Failed to get results');
 								}
-								
+
 								// Render after data
 								renderView();
 							});
 						}
-						
+
 						renderView();
 					});
 				}
 			}
-			
+
 			// List ports
 			SerialPortStatic.list(function(err, ports) {
 				// Clear dropdown
 				model.selectPort.options.length = 0;
-				
+
 				actions.addLog('Open ports');
 				ports.forEach(function( port ) {
 					console.log(port);
 					actions.addLog(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
-					
+
 					// Populate dropdown
 					var elOption = document.createElement("option");
 					elOption.textContent = port.comName + ' - ' + port.manufacturer;
@@ -488,10 +530,10 @@
 					model.selectPort.appendChild(elOption);
 				});
 			});
-			
+
 			function renderView() {
 				model.btnConnect.disabled = model.isConnecting;
-				
+
 				if ( true === model.isConnected() ) {
 					model.sectCon.classList.remove('hide');
 					model.sectDiscon.classList.add('hide');
@@ -499,7 +541,7 @@
 					model.sectCon.classList.add('hide');
 					model.sectDiscon.classList.remove('hide');
 				}
-				
+
 				// Hide winner notification
 				model.elWinner1.classList.remove("show");
 				model.elWinner2.classList.remove("show");
@@ -507,7 +549,7 @@
 				// -> triggering reflow /* The actual magic */
 				void model.elWinner1.offsetWidth;
 				void model.elWinner2.offsetWidth;
-				
+
 				if ( model.laneReset || (model.lane1 > 0 && model.lane2 > 0 && model.lane1 == model.lane2) ) {
 					// Switch error
 					model.elLane1.innerHTML = 'Sensor Error';
@@ -519,11 +561,11 @@
 					} else if ( model.lane2 < model.lane1 ) {
 						model.elWinner2.classList.add("show");
 					}
-					
+
 					// Show lane times
 					model.elLane1.innerHTML = model.lane1 + 's';
 					model.elLane2.innerHTML = model.lane2 + 's';
-					
+
 					// Update best time
 					// Don't allow best times less than 2.2s in case it's a glitch
 					if ( model.best > model.lane1 && model.lane1 > 2.2 ) {
@@ -538,7 +580,7 @@
 				model.elStatus.innerHTML = model.statusMsg;
 				model.laneReset = false;
 			}
-			
+
 			renderView();
 		</script>
 	</body>

@@ -1,3 +1,4 @@
 _gsdata_
 .ftpquota
 /src/node_modules
+/node*

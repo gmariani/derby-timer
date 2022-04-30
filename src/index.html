@@ -3,14 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <title>Pinewood Derby Timer</title>
-        <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <!-- <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> -->
         <link href="assets/css/index.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
         <div class="screen-container">
-            <div id="state-disconnected" class="connect-screen">
+            <div id="state-disconnected" class="connect-screen screen w-100">
                 <img class="connect-screen__logo" src="assets/img/PWD_Header_Landing_Page_2100x600.jpg" width="100%" />
-                <h4 class="connect-screen__cta text-center">To get started, press Connect</h4>
+                <h4 class="connect-screen__cta disable-user-select text-center">To get started, press Connect</h4>
                 <form class="connect-screen__connect form-inline justify-content-center">
                     <div class="form-group mx-sm-3">
                         <select id="selectPort" class="form-control">
@@ -22,9 +22,9 @@
                         </select>
                     </div>
                     <button type="button" class="btn btn-primary" onClick="actions.connectPort();" id="btnConnect">
-                        Connect
+                        <i class="fas fa-link"></i> Connect
                     </button>
-                </div>
+                </form>
                 <div class="connect-screen__instructions hide">
                     <strong>Instructions</strong>
                     <ol>
@@ -42,8 +42,8 @@
                                 </li>
                                 <li>
                                     The device will be called something with
-                                    <em>Silicon Labs</em> in the name. This COM Port number is what you will use when using
-                                    <em>DerbyTimer</em>.
+                                    <em>Silicon Labs</em> in the name. This COM Port number is what you will use when
+                                    using <em>DerbyTimer</em>.
                                 </li>
                                 <li>
                                     If necessary, confirm the settings on the device:<br />
@@ -59,77 +59,109 @@
                         </li>
                         <li>Connect the <em>Start Switch</em> wire to first set of pins on the <em>DerbyStick</em>.</li>
                         <li>
-                            Connect <em>Light Sensors</em> to the <em>DerbyStick</em> with the black stripe facing up in the
-                            <em>1</em> and <em>2</em> pins respectively.
+                            Connect <em>Light Sensors</em> to the <em>DerbyStick</em> with the black stripe facing up in
+                            the <em>1</em> and <em>2</em> pins respectively.
                         </li>
                         <li>
                             Connect IR light bar to plug and place over
                             <em>Light Sensors</em>.
                         </li>
                         <li>
-                            Open <em>DerbyTimer</em> and select the COM port noted earlier and click on <em>Connect</em>.
+                            Open <em>DerbyTimer</em> and select the COM port noted earlier and click on
+                            <em>Connect</em>.
                         </li>
                         <li>
                             Perform the "Initial Reset" by moving the
                             <em>Start Switch</em> from "Open" to "Closed" and back to "Open" - holding the
-                            <em>Start Switch</em> "Closed" for at least 0.5 seconds to reset the timer. This will display
-                            "DerbyStick4L v1.0 - 2 Lanes Found" (approximately) in the event log when done properly. The
-                            <em>DerbyStick</em> LED will also flash once for each sensor found. If no sensors are found, the
-                            LED will flash slowly until the timer is removed from the USB and reinserted.
+                            <em>Start Switch</em> "Closed" for at least 0.5 seconds to reset the timer. This will
+                            display "DerbyStick4L v1.0 - 2 Lanes Found" (approximately) in the event log when done
+                            properly. The <em>DerbyStick</em> LED will also flash once for each sensor found. If no
+                            sensors are found, the LED will flash slowly until the timer is removed from the USB and
+                            reinserted.
                         </li>
                         <li>
-                            When ready to race, hold the Switch closed for at least 0.5 seconds to reset the timer. When the
-                            Switch is then opened, the timer will begin timing the race and the LED will turn on while
-                            racing. When all cars have finished OR 9.8 seconds has elapsed, the timer will stop and the LED
-                            will turn off.
+                            When ready to race, hold the Switch closed for at least 0.5 seconds to reset the timer. When
+                            the Switch is then opened, the timer will begin timing the race and the LED will turn on
+                            while racing. When all cars have finished OR 9.8 seconds has elapsed, the timer will stop
+                            and the LED will turn off.
                         </li>
                     </ol>
                 </div>
             </div>
 
-            <div id="state-connected" class="timer-screen">
-                <section>
-                    <div class="result lane1">
-                        <h2>Lane 1</h2>
-                        <span id="lane1" class="time">0.000s</span>
-                        <span id="winner1" class="winner">Winner</span>
+            <div id="state-connected" class=" d-flex flex-column p-5 screen timer-screen vh-100 w-100">
+                <div class="d-flex align-items-center justify-content-center timer-screen__reset-container">
+                    <div id="reset-msg" class="alert alert-success shadow-sm disable-user-select timer-screen__reset">
+                        Timer Reset!
                     </div>
-                    <div class="result lane2">
-                        <h2>Lane 2</h2>
-                        <span id="lane2" class="time">0.000s</span>
-                        <span id="winner2" class="winner">Winner</span>
-                    </div>
-                    <div class="result best">
-                        <h2>Best</h2>
-                        <span id="best" class="time">0.000s</span>
-                    </div>
-                </section>
+                </div>
 
-                <aside>
-                    <h3>Activity Log</h3>
-                    <div id="log" class="log">
-                        <div class="message"></div>
+                <div class="timer-screen__logo-container align-content-center d-flex row">
+                    <div class="timer-screen__logo-side d-flex flex-grow-1"></div>
+                    <img class="timer-screen__logo" src="assets/img/PWD_Header_Landing_Page_2100x600.jpg" width="50%" />
+                    <div class="timer-screen__logo-side d-flex flex-grow-1"></div>
+                </div>
+                <div class="align-content-center d-flex flex-grow-1 row">
+                    <div class="timer-screen__lane col-6">
+                        <h2
+                            id="lane1-title"
+                            class="timer-screen__lane-title disable-user-select mb-0 font-italic font-weight-bold"
+                        >
+                            Lane 1
+                        </h2>
+                        <span id="lane1-time" class="timer-screen__lane-time disable-user-select ">0.000s</span>
                     </div>
-                    <footer>
-                        <button onClick="actions.resetTimer();" id="btnReset">
-                            Reset Timer
-                        </button>
-                        <button onClick="actions.closePort();" id="btnClose">
-                            Close Timer
-                        </button>
-                    </footer>
-                </aside>
+                    <div class="timer-screen__lane col-6 text-right">
+                        <h2
+                            id="lane2-title"
+                            class="timer-screen__lane-title disable-user-select mb-0 font-italic font-weight-bold"
+                        >
+                            Lane 2
+                        </h2>
+                        <span id="lane2-time" class="timer-screen__lane-time disable-user-select ">0.000s</span>
+                    </div>
+                </div>
+
+                <div class="row mt-5">
+                    <div class="col">
+                        <h2 class="d-inline disable-user-select font-italic timer-screen__lane-title--small">Best</h2>
+                        <span
+                            id="best-time"
+                            class="font-italic ml-5 timer-screen__lane-time--small disable-user-select "
+                            >0.000s</span
+                        >
+                    </div>
+                    <div class="col-md-auto">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button class="btn btn-secondary" onClick="actions.resetTimer();" id="btnReset">
+                                <i class="fas fa-stopwatch"></i> Reset
+                            </button>
+                            <button class="btn btn-secondary" onClick="actions.closePort();" id="btnClose">
+                                <i class="fas fa-unlink"></i> Disconnect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-5 hide">
+                    <ul id="log" class="col p-0 list-group list-group-flush timer-screen__log"></ul>
+                </div>
             </div>
         </div>
 
         <footer class="fixed-bottom p-1 text-center text-muted">
-            <div class="small"><strong class="mr-1">Status</strong><span id="status"></span></div>
+            <div class="small disable-user-select"><strong class="mr-1">Status</strong><span id="status"></span></div>
             <small
                 >Node <span id="node-version"></span> | NW.js <span id="nw-version"></span> | NW.js Flavor
                 <span id="nw-flavor"></span
             ></small>
         </footer>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.0/gsap.min.js"></script>
+        <script>
+            const win = nw.Window.get();
+            //win.showDevTools();
+        </script>
+        <script src="https://kit.fontawesome.com/70c8c9873f.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.2/gsap.min.js"></script>
         <script src="assets/js/index.js"></script>
     </body>
 </html>
